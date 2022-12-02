@@ -1,2 +1,7 @@
+<<<<<<< HEAD
 #!/bin/bash
 cd -
+=======
+#!/bin/bash
+cd -
+>>>>>>> 88f867d897eeb31e1882f38493bf753062d37de4
