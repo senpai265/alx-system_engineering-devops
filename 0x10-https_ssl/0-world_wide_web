@@ -1,30 +1,18 @@
-#!/bin/bash
+#!/usr/bin/env bash
+#Configure your domain zone so that the subdomain www and display information about subdomains
 
-function display_info() {
-    local domain="$1"
-    local subdomain="$2"
-    local subdomains=("www" "lb-01" "web-01" "web-02")
-
-    if [[ -z "$subdomain" ]]; then
-        for sub in "${subdomains[@]}"; do
-            info=$(dig +short "$sub.$domain" | awk '{ print $1 }')
-            record_type=$(dig +short "$sub.$domain" | awk '{ print $4 }')
-            echo "The subdomain $sub is a $record_type record and points to $info"
-        done
-    else
-        info=$(dig +short "$subdomain.$domain" | awk '{ print $1 }')
-        record_type=$(dig +short "$subdomain.$domain" | awk '{ print $4 }')
-        echo "The subdomain $subdomain is a $record_type record and points to $info"
-    fi
-}
-
-if [[ $# -lt 1 ]]; then
-    echo "Usage: $0 <domain> [<subdomain>]"
-    exit 1
+if [ "$#" = 1 ]
+then
+    subdomains=("www" "lb-01" "web-01" "web-02")
+    for sub_domain in "${subdomains[@]}"
+    do
+	record_type=$(dig $sub_domain.$1 | grep -A1 'ANSWER SECTION' | tail -1 | awk '{print $4}')
+        destination=$(dig $sub_domain.$1 | grep -A1 'ANSWER SECTION' | tail -1 | awk '{print $5}')
+	echo "The subdomain $sub_domain is a $record_type record and points to $destination"
+    done
+elif [ "$#" = 2 ]
+then
+    record_type=$(dig $2.$1 | grep -A1 'ANSWER SECTION' | tail -1 | awk '{print $4}')
+    destination=$(dig $2.$1 | grep -A1 'ANSWER SECTION' | tail -1 | awk '{print $5}')
+    echo "The subdomain $2 is a $record_type record and points to $destination"
 fi
-
-domain="$1"
-subdomain="$2"
-
-display_info "$domain" "$subdomain"
-
